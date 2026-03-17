@@ -1,22 +1,21 @@
 <?php
 $target_dir = "files/";
-$target_file = $target_dir . basename($_FILES["fileToUpload"]["name"]);
-$uploadOk = 1;
-$FileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 
-if (file_exists($target_file)) {
-    echo "Sorry, file already exists.";
-    $uploadOk = 0;
+$unallowed = ['php', 'html', 'htm', 'js', 'css', 'exe', 'sh', 'bat', 'cmd', 'com', 'vbs', 'vbe', 'wsf', 'wsh', 'ps1', 'ps2', 'psm1'];
+
+$ext = strtolower(pathinfo($_FILES["fileToUpload"]["name"], PATHINFO_EXTENSION));
+
+if (in_array($ext, $unallowed)) {
+    die("Nice try.");
 }
 
-if ($uploadOk == 0) {
-    echo "Sorry, your file was not uploaded.";
+$newName = bin2hex(random_bytes(16)) . "." . $ext;
+$target_file = $target_dir . $newName;
 
+
+if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+    echo "Uploaded as " . htmlspecialchars($newName);
 } else {
-    if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
-        echo "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.";
-    } else {
-        echo "Sorry, there was an error uploading your file.";
-    }
+    echo "Upload failed.";
 }
 ?>
